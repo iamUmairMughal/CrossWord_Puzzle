@@ -55,19 +55,26 @@ def get_all_possible_words(crossboard_words, all_strings):
 
     return possible_words
 def _solve(W1_inters, key, word_W1, known_words, possible_words):
-
+    found_results = {}
     for ik, ipos in W1_inters.items():
         W2 = crossboard_words.get(ik)
         W2_possible = possible_words.get(ik)
         W2_inters = W2.get('intersects').get(key)
-
+        print(W2_possible)
+        print(ik, ipos)
+        print(W2_inters)
+        print(key)
         for rW2, word_W2 in W2_possible.items():
+            print(word_W2)
             for word in word_W2:
-                # print(word, len(word))
-                if word[int(W2_inters)] == word_W1[int(ipos)]:
+                print(rW2)
+                print(word, len(word))
+                if word[int(ipos)] == word_W1[int(W2_inters)] and word not in known_words.values():
                     print(key, 'W1:', word_W1)
                     print(ik, 'W2:', word)
+                    found_results[ik] = word
                     known_words[ik] = word
+
     print(known_words)
     return known_words
 
@@ -77,14 +84,15 @@ def solve_puzzle(crossboard_words, possible_words):
     for key, value in crossboard_words.items():
         if value.get('unknown_char') == 0:
             known_words[key] = value.get('word')
-
-    while len(known_words) != len(crossboard_words):
+    x=0
+    # while len(known_words) != len(crossboard_words):
+    while x<2:
             key = list(known_words.keys())[-1]
             W1 = crossboard_words.get(key)
             word_W1 = known_words.get(key)
             W1_inters = W1.get('intersects')
             known_words = _solve(W1_inters, key, word_W1, known_words, possible_words)
-
+            x+=1
     return results
 
 
@@ -94,7 +102,7 @@ print(crossboard_words)
 
 all_strings = get_all_strings(regEx)
 possible_words = get_all_possible_words(crossboard_words, all_strings)
-print(possible_words)
+print(possible_words.get('9').get('(AH)+A+'))
 
 print(solve_puzzle(crossboard_words, possible_words))
 
