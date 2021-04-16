@@ -54,45 +54,57 @@ def get_all_possible_words(crossboard_words, all_strings):
         possible_words[key] = words
 
     return possible_words
-def _solve(W1_inters, key, word_W1, known_words, possible_words):
-    found_results = {}
-    for ik, ipos in W1_inters.items():
-        W2 = crossboard_words.get(ik)
-        W2_possible = possible_words.get(ik)
-        W2_inters = W2.get('intersects').get(key)
-        print(W2_possible)
-        print(ik, ipos)
-        print(W2_inters)
-        print(key)
-        for rW2, word_W2 in W2_possible.items():
-            print(word_W2)
-            for word in word_W2:
-                print(rW2)
-                print(word, len(word))
-                if word[int(ipos)] == word_W1[int(W2_inters)] and word not in known_words.values():
-                    print(key, 'W1:', word_W1)
-                    print(ik, 'W2:', word)
-                    found_results[ik] = word
-                    known_words[ik] = word
 
-    print(known_words)
-    return known_words
+def _solve(key, W1_inter, W2_inter,intersect_key_1, intersect_key_2, possible_words):
+
+    final_words = {}
+    for regW1, W1list in possible_words.get(key).items():
+        for Word_1 in W1list:
+            for regW2, W2list in possible_words.get(W1_inter).items():
+                for Word_2 in W2list:
+                    for regW3, W3list in possible_words.get(W2_inter).items():
+                        for Word_3 in W3list:
+                            if Word_1[int(intersect_key_1[0])] == Word_2[int(intersect_key_1[1])]:
+                                if Word_2[int(intersect_key_2[0])] == Word_3[int(intersect_key_2[1])]:
+                                    if [Word_1] not in final_words.values():
+                                        final_words[regW1] = [Word_1]
+
+
+    return final_words
 
 def solve_puzzle(crossboard_words, possible_words):
     results = None
     known_words = {}
-    for key, value in crossboard_words.items():
-        if value.get('unknown_char') == 0:
-            known_words[key] = value.get('word')
-    x=0
-    # while len(known_words) != len(crossboard_words):
-    while x<2:
-            key = list(known_words.keys())[-1]
-            W1 = crossboard_words.get(key)
-            word_W1 = known_words.get(key)
-            W1_inters = W1.get('intersects')
-            known_words = _solve(W1_inters, key, word_W1, known_words, possible_words)
-            x+=1
+    for key_1, value_1 in crossboard_words.items():
+        intersect_1 = value_1.get('intersects')
+        for key_2, value_2 in intersect_1.items():
+            intersect_2 = crossboard_words.get(key_2).get('intersects')
+            intersect_key_1 = (intersect_2.get(key_1), value_2)
+            for key_3, value_3 in intersect_2.items():
+                if key_3 is not key_1:
+                    intersect_3 = crossboard_words.get(key_3).get('intersects')
+                    intersect_key_2 = (intersect_3.get(key_2), value_3)
+                    known_words[key_1] = _solve(key_1, key_2, key_3, intersect_key_1, intersect_key_2, possible_words)
+
+    print(known_words)
+    #
+    # print('HAHAAA' in known_words.get('0').get('HAHA*'))
+    # print('HEHEHE' in known_words.get('1').get('HE(HE)+'))
+    # print('HOHO' in known_words.get('2').get('(HO)+'))
+    # print('HAA' in known_words.get('3').get('HA+'))
+    # print('TEHEHEHE' in known_words.get('4').get('TE(HE+)+'))
+    # print('LOOL' in known_words.get('5').get('LO+L'))
+    # print('LOLOLOL' in known_words.get('6').get('L(OL)+'))
+    # print('LULZ' in known_words.get('7').get('LULZ'))
+    # print('KEKE' in known_words.get('8').get('K(EK)*E'))
+    # print('ROTFL' in known_words.get('9').get('ROT?FL'))
+    # print('MWAHA' in known_words.get('10').get('MWA(HA)+'))
+    # print('LAWL' in known_words.get('11').get('LAW*L'))
+    # print('HEH' in known_words.get('12').get('H(EH)+'))
+    # print('HARRHARR' in known_words.get('13').get('(HAR+)+'))
+    # print('JAJAJAJAJA' in known_words.get('14').get('(JA)+'))
+    # print('AHAHA' in known_words.get('15').get('(AH)+A+'))
+
     return results
 
 
@@ -102,28 +114,6 @@ print(crossboard_words)
 
 all_strings = get_all_strings(regEx)
 possible_words = get_all_possible_words(crossboard_words, all_strings)
-print(possible_words.get('9').get('(AH)+A+'))
+print(possible_words)
 
 print(solve_puzzle(crossboard_words, possible_words))
-
-
-
-#
-# def solve_puzzle(crossboard_words, possible_words):
-#     results = None
-#     for key, value in crossboard_words.items():
-#         word = None
-#         inter = value.get('intersects')
-#         pos_words = possible_words.get(key)
-#         for i, pos in inter.items():
-#             inter_words = possible_words.get(i)
-#             i_inter = crossboard_words.get(i).get('intersects').get(key)
-#             for kr, kw in pos_words.items():
-#                 for ir,iw in inter_words.items():
-#                     for w1 in kw:
-#                         for w2 in iw:
-#                             if w1[int(i_inter)] == w2[int(pos)]:
-#                                 print(key, (kr, w1))
-#                                 print(i, (ir,w2))
-#         break
-#     return results
